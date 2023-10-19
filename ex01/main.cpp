@@ -1,6 +1,9 @@
-#include "./RPN.cpp"
-#include <iostream>
+#include "./RPN.hpp"
+
+
 int main(int av, char **ac)
 {
-    std::cout << ac[1] << std::endl;
+    if(av != 2)
+        printerror();  
+   push_stack(ac[1]);
  }
