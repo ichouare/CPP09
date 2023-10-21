@@ -6,62 +6,74 @@
 #include <vector>
 #include <deque>
 #include <stdlib.h>
+ #include <stdlib.h>
+#include <cstring>
+#include <iomanip>
+ #include<ctime>
 
 
 struct mergeItems
 {
     std::vector<int> cnt1;    
     std::deque<int>  cnt2;
+    int time_sort_vector;
+    int time_sort_deque;
 };
 
 template <typename T>
 void fullCnt(T& cnt,int ac, char** nbrs, int i)
 {
-    // std::cout << ac << std::endl;
+    int j = 0;
     while(i <  ac)
     {
         cnt.push_back(atoi(nbrs[i]));
-        std::cout << nbrs[i] << std::endl;
+        if(cnt[j] < 0 || strlen(nbrs[i]) == 0)
+            {
+                std::cout << "Error" << std::endl;
+                exit(0);
+            }
         i++;
+        j++;
     }
 }
 
-template <typename T, typename U>
-void splitCnt(T& cnt,int ac, U nbrs, int i)
-{
-    // std::cout << ac << std::endl;
-    while(i <  ac)
-    {
-        cnt.push_back(atoi(nbrs[i]));
-        std::cout << nbrs[i] << std::endl;
-        i++;
-    }
-}
 
-template <typename T>
-T mergesort(T cnt)
-{
-    T containeOne;
-    T containeTwo;
-    if(cnt.size() == 1)
-        return cnt;
-    splitCnt(containeOne, cnt.size() / 2, cnt, 0);
-    splitCnt(containeTwo, cnt.size(), cnt,  cnt.size() / 2);
-    int i = 0;
-    while(i < containeOne.size())
-    {
-        std::cout << containeOne[i] << std::endl;
-        i++;
-    }
-    std::cout << "--------------------------------"  << std::endl;
-    i = 0;
-    while(i < containeTwo.size())
-    {
-        std::cout << containeTwo[i] << std::endl;
-        i++;
-    }
-    return containeOne;
-}
+
+// void insetSort(std::vector<int>& arr, int begin , int end)
+// {
+//     int i = begin + 1;
+//     int j = 0;
+//     while(i <= end)
+//     {
+//         int key = arr[i];
+//         j = i - 1;
+//         while(j >= begin && arr[j] > key)
+//         {
+//             arr[j + 1] = arr[j];
+//             j--;
+//         }
+//         i++;
+//     }
+// }
+// template <typename T>
+// T mergesort(T cnt)
+// {
+
+// }
+
+// void mergeInsertSort(std::vector<int>& arr, int begin , int end)
+// {
+//     if(begin < end)
+//     {
+//         int middle = (end + begin) / 2;
+//         mergeInsertSort(arr, begin, middle);
+//         mergeInsertSort(arr, middle + 1, end);
+//         //inser sort(arr)
+//         insetSort(arr, begin, end);
+//         // merge()
+//     }
+
+// }
 
 
 #endif
