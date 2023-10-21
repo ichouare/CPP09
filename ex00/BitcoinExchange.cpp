@@ -1,12 +1,17 @@
 #include "./BitcoinExchange.hpp"
 
-int ft_isalpha(std::string str , int cnt)
+void count_separators(std::string str)
 {
     int i = 0;
-    // std::cout << "|"<< str << "|"<< std::endl;
+
+    while()
+}
+
+int ft_isalpha(std::string str , int cnt)
+{
+   unsigned int i = 0;
     while(i < str.size())
     {
-        // check str if it just digit or not
         if(cnt == 2 && (std::isdigit(str[i]) || str[i] == 32 || str[i] == '\n'))
             i++;
        else  if(std::isdigit(str[i]))
@@ -43,7 +48,6 @@ int parser_date(std::string key)
     std::vector<std::string>::iterator it;
     int i = 0;
     int pos = 0;
-    //std::cout << key << std::endl;
     while(key.size())
     {
         pos = key.find("-");
@@ -76,36 +80,40 @@ int parser_date(std::string key)
     return 1;
 }
 
-Btc::Btc(){}
+// Btc::Btc(){}
 
-Btc::Btc(std::string file_Input, std::string Data)
+void Btc(std::string file_Input, std::string Data)
 {
+    m_date items;
+    std::fstream file_1;
+    std::fstream  file_2;
+    items.count = 0;
     try{
-        file_1.open(file_Input.data(), std::ios::in);
-        file_2.open(Data.data(), std::ios::in);
+      file_1.open(file_Input.data(), std::ios::in);
+      file_2.open(Data.data(), std::ios::in);
         if(!file_1.is_open() || !file_2.is_open())
         {
+            std::cout << "Loading.... " << std::endl;
             throw -1;
         }
-        while(std::getline(file_1, line, '\n'))
+        while(std::getline(file_1, items.line, '\n'))
         {
-                std::string key = line.substr(0,  line.find(","));
-                std::string value = line.substr(line.find(",") + 1, strlen(line.data()));
+                std::string key = items.line.substr(0,  items.line.find(","));
+                std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
                 if(key != "date")
-                    price.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
+                    items.price.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
         }
 
-        while(std::getline(file_2, line, '\n'))
+        int 
+        while(std::getline(file_2, items.line, '\n'))
         {
-            //std::cout << line << std::endl;
-            int pos = line.find("|");
-            // std::cout << pos << std::endl;
+            int pos = items.line.find("|");
             if(pos == -1)
-                std::cout << "Error: bad input => " << line  << std::endl;
+                std::cout << "Error: bad input => " << items.line  << std::endl;
             else
             {
-                std::string key = line.substr(0,  pos);
-                std::string value = line.substr(pos + 1, strlen(line.data()));
+                std::string key = items.line.substr(0,  pos);
+                std::string value = items.line.substr(pos + 1, strlen(items.line.data()));
                 double number  = static_cast<double>(atof(value.data()));
                 if(number > 1000)
                     std::cout << "Error: too large a number"  << std::endl;
@@ -113,38 +121,34 @@ Btc::Btc(std::string file_Input, std::string Data)
                     std::cout << "Error: not a positive number"  << std::endl;
                 else
                 {
-                   if( parser_date(key) != 0)
+                   if(parser_date(key) != 0)
                    {
-                        // std::cout << key << value << std::endl;
-                        it=price.find(key);
-                        // std::cout << it->second <<std::endl;
-                        // std::cout << key << " => " << number << " = " << (it->second * number) << std::endl;
-                        if(it == price.end())
+                        items.it = items.price.find(key);
+                        if(items.it == items.price.end())
                         {
-                            it = price.lower_bound(key);
-                            it--;
-                             std::cout << key << " => " << number << " = " << (it->second * number) << std::endl;
-                            // std::cout << "find more\n"; 
+                            items.it = items.price.lower_bound(key);
+                            items.it--;
+                            // items.it--;
+                            std::cout << key << " => " << number << " = " << (items.it->second * number) << std::endl; 
                         }
+                    else
+                    {
+                        std::cout << key << " => " << number << " = " << (items.it->second * number) << std::endl; 
+                    }
                    }
                     else  if(key != "date ")
                     {
-                        std::cout << "Error: bad input =>" << line << std::endl;
+                        std::cout << "Error: bad input =>" << items.line << std::endl;
                     }   
                 }
-                // parser_price(key);
-
-            }
-                //std::cout << value << key << std::endl;
-                // if(key != "Date")
-                //     Fetch.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); 
+            } 
+            items.count++;
         }
-        // std::cout << Fetch["2011-01-03"] << std::endl;
+        std::cout << "Number of items :" <<  items.count <<  std::endl;
     }
-
     catch(...)
     {
-        std::cout << "here" << std::endl;
+        std::cout << "Error: bad input =>" << std::endl;
     }
 }
 
