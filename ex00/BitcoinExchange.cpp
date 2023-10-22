@@ -1,12 +1,5 @@
 #include "./BitcoinExchange.hpp"
 
-// void count_separators(std::string str)
-// {
-//     int i = 0;
-
-//     while()
-// }
-
 
 std::string trim(std::string original)
 {
@@ -27,6 +20,9 @@ std::string trim(std::string original)
     return original.substr(begin_index, i + 1);
 }
 
+
+
+
 int ft_isalpha(std::string str , int cnt)
 {
    unsigned int i = 0;
@@ -39,22 +35,21 @@ int ft_isalpha(std::string str , int cnt)
         else if( i != 0 && str[i] == '.')
             i++;
         else{
-            // std::cout << "exit" << "|" << str[i] << cnt << "|" << std::endl;
             return -1;
         }
     }
     return 0;
 }
 
-int check_date(m_date m_d)
+int check_date(m_date& m_d)
 {
     int max_days_in_month[12]= {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     int i = 0;
     while(i < 3)
     {
-        if(m_d.date[0] < 2009 
-            || (m_d.date[0] == 2009 && m_d.date[1] == 1 && m_d.date[2] == 1) 
-            || m_d.date[1] < 0 || m_d.date[1] > 12 || m_d.date[2] < 0 || m_d.date[2] > max_days_in_month[m_d.date[1]] )
+        if(m_d.date[0] <  m_d.min_date[0]
+            || (m_d.date[0] ==  m_d.min_date[0] && m_d.date[1] <  m_d.min_date[1] && m_d.date[2] <  m_d.min_date[2]) 
+            || m_d.date[1] < 0 || m_d.date[1] > 12 || m_d.date[2] < 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
             return (0);
         
         i++;
@@ -62,12 +57,25 @@ int check_date(m_date m_d)
     return 1;
 }
 
-int parser_date(std::string key)
+int check_date_data(m_date m_d)
+{
+    int max_days_in_month[12]= {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int i = 0;
+    while(i < 3)
+    {
+        if(m_d.date[1] < 0 || m_d.date[1] > 12 || m_d.date[2] < 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
+            return (0);
+        
+        i++;
+    }
+    return 1;
+}
+
+int parser_date_data(std::string key)
 {
     m_date Date;
-    
-    std::vector<std::string> date;
-    std::vector<std::string>::iterator it;
+    std::deque<std::string> date;
+    std::deque<std::string>::iterator it;
     int i = 0;
     int pos = 0;
     while(key.size())
@@ -93,7 +101,46 @@ int parser_date(std::string key)
     {
         if(ft_isalpha(*it, i) == -1)
             return 0;
-        Date.date[i] = static_cast<int>(atof((*it).data()));
+        Date.date[i] = static_cast<float>(atof((*it).data()));
+    it++;
+    i++;
+    }
+    if(check_date_data(Date) == 0)
+        return 0;
+    return 1;
+}
+
+int parser_date(std::string key, m_date& Date)
+{
+    // m_date Date;
+    std::deque<std::string> date;
+    std::deque<std::string>::iterator it;
+    int i = 0;
+    int pos = 0;
+    while(key.size())
+    {
+        pos = key.find("-");
+        if(pos != -1)
+        {
+            date.push_back(key.substr(0, key.find("-")).data());
+            key = key.substr(key.find("-") + 1 , key.size());
+        }
+        else
+        {
+            date.push_back(key.data());
+            key = "";
+        }
+        i++;
+    }
+    if(i != 3)
+        return 0;
+    it = date.begin();
+    i = 0;
+    while(it != date.end())
+    {
+        if(ft_isalpha(*it, i) == -1)
+            return 0;
+        Date.date[i] = static_cast<float>(atof((*it).data()));
     it++;
     i++;
     }
@@ -102,7 +149,42 @@ int parser_date(std::string key)
     return 1;
 }
 
-// Btc::Btc(){}
+void check_files(std::string file_Input, std::string Data, std::fstream& file_1, std::fstream& file_2)
+{
+      file_1.open(file_Input.data(), std::ios::in);
+      file_2.open(Data.data(), std::ios::in);
+        if(!file_1.is_open() || !file_2.is_open())
+            throw -1;
+}
+
+void   available_date(m_date& items)
+{
+    std::string date = items.price.begin()->first;
+    int i = 0;
+    int pos = 0;
+    while (i < 3)
+    {
+        pos = (date).find("-");
+        items.min_date[i] = atoi((date).substr(0, pos).data());
+       ( date) = (date).substr(pos + 1, (date).size());
+        i++;
+    }
+}
+
+void read_data_file(std::fstream& file_1,m_date& items)
+{
+    while(std::getline(file_1, items.line, '\n'))
+    {
+                std::string key = items.line.substr(0,  items.line.find(","));
+                std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
+                key = trim(key);
+                value = trim(value);
+                if((key.empty() || value.empty()) || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
+                    throw -1;
+                items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
+    }
+    available_date(items);
+    }
 
 void Btc(std::string file_Input, std::string Data)
 {
@@ -110,22 +192,10 @@ void Btc(std::string file_Input, std::string Data)
     std::fstream file_1;
     std::fstream  file_2;
     try{
-      file_1.open(file_Input.data(), std::ios::in);
-      file_2.open(Data.data(), std::ios::in);
-        if(!file_1.is_open() || !file_2.is_open())
-            throw -1;
-        while(std::getline(file_1, items.line, '\n'))
-        {
-                std::string key = items.line.substr(0,  items.line.find(","));
-                std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
-                items.price.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
-        }
-
-        // int 
+        check_files(file_Input, Data, file_1, file_2);
+        read_data_file(file_1, items);
         while(std::getline(file_2, items.line, '\n'))
         {
-            // items.line = trim(items.line);
-                // std::cout <<"|" <<  items.line  << "|" << items.line.size()<< std::endl;
             int pos = items.line.find("|");
             if(pos == -1 && items.line.size() != 0)
             {
@@ -139,10 +209,10 @@ void Btc(std::string file_Input, std::string Data)
                 key = trim(key);
                 value = trim(value);
                 
-                double number  = static_cast<double>(atof(value.data()));
-                if(ft_isalpha(value, 2) == -1 && trim(value) != "value")
+                double number  = static_cast<float>(atof(value.data()));
+                if((items.line.empty() == 0 &&  (value.empty() || key.empty())) || (ft_isalpha(value, 2) == -1 && trim(value) != "value"))
                     {
-                        std::cout << "Error: bad input : " <<"|" <<  trim(value) << "|" << std::endl;
+                        std::cout << "Error: bad input" << std::endl;
                     }
                 else if(number > 1000)
                     std::cout << "Error: too large a number"  << std::endl;
@@ -150,36 +220,29 @@ void Btc(std::string file_Input, std::string Data)
                     std::cout << "Error: not a positive number"  << std::endl;
                 else
                 {
-                    // std::cout << "key:   " << key  << "  "<<  "value :   " << value << std::endl;
-                   
-                   if(parser_date(key) != 0 )
+                   if(parser_date(key, items) != 0 )
                     {
-                       
-                        // std::cout  << key << std::endl;
                         items.it = items.price.find(key);
                         if(items.it == items.price.end())
                         {
                             items.it = items.price.lower_bound(key);
                             items.it--;
-                            std::cout << key << " => " << number << " = " << (float)(items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << number  << "*" << items.it->second << " = "  << std::setprecision(10) << (items.it->second * number) << std::endl; 
                         }
                         else
                         {
-                            std::cout << key << " => " << number << " = " << (float)(items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << number << " = " <<  std::setprecision(10) << (items.it->second * number) << std::endl; 
                         }
                    }
                     else  if(trim(key) != "date" && items.line.size())
-                    {
-                        // std::cout << "|" << key << "|" <<std::endl;
                         std::cout << "Error: bad input"<< std::endl;
-                    }   
                 }
             } 
         }
     }
     catch(...)
     {
-        std::cout << "Error: bad input =>" << std::endl;
+        std::cout << "Error: bad files" << std::endl;
     }
 }
 

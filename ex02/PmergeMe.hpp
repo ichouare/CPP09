@@ -10,16 +10,24 @@
 #include <cstring>
 #include <iomanip>
  #include<ctime>
+ #include <sys/time.h>
 
 
 struct mergeItems
 {
     std::vector<int> cnt1;    
     std::deque<int>  cnt2;
-    int time_sort_vector;
-    int time_sort_deque;
+    double  time_sort_vector;
+    double time_sort_deque;
 };
 
+void insetSort(std::vector<int>& arr, int begin, int end);
+void insetSort(std::deque<int>& arr, int begin, int end);
+void mergeSort(std::vector<int>& arr, int begin, int end);
+void mergeSort(std::deque<int>& arr, int begin, int end);
+void printfContainer(std::vector<int> arr, std::string msg);
+void printfContainer(std::deque<int> arr, std::string msg);
+int is_disgit(std::string str);
 template <typename T>
 void fullCnt(T& cnt,int ac, char** nbrs, int i)
 {
@@ -27,7 +35,7 @@ void fullCnt(T& cnt,int ac, char** nbrs, int i)
     while(i <  ac)
     {
         cnt.push_back(atoi(nbrs[i]));
-        if(cnt[j] < 0 || strlen(nbrs[i]) == 0)
+        if(cnt[j] < 0 || strlen(nbrs[i]) == 0 || is_disgit(nbrs[i]) == 1) 
             {
                 std::cout << "Error" << std::endl;
                 exit(0);

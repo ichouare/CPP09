@@ -2,7 +2,6 @@
 
 int is_operator(std::string str, int& op)
 {
-    // std::cout << str << std::endl;
     if(str == "*" || str == "/" || str == "+" || str == "-" )
     {
             op++;
@@ -11,10 +10,6 @@ int is_operator(std::string str, int& op)
     return 0;
 }
 
-
-
-
-// || isdigit(atoi(word.c_str())) == 0
 void push_stack(std::string str)
 {
     int count_digit = 0;
