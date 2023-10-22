@@ -9,16 +9,19 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <stdlib.h>
+
 
  struct m_date{
     int date[3];
     std::string line;
     std::map<std::string, double> price;
     std::map<std::string, double>::iterator it;
-    int count;
 };
 
 void Btc(std::string file_Input, std::string Data);
+std::string trim(std::string original);
+
 // class Btc{
 
 //     public:

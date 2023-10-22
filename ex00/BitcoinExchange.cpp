@@ -1,10 +1,30 @@
 #include "./BitcoinExchange.hpp"
 
-void count_separators(std::string str)
-{
-    int i = 0;
+// void count_separators(std::string str)
+// {
+//     int i = 0;
 
-    while()
+//     while()
+// }
+
+
+std::string trim(std::string original)
+{
+    unsigned int begin_index = 0;
+    unsigned int i = 0;
+    if(original.size() == 0)
+        return "";
+    while(isblank(original[i]) != 0 && i <= original.size())
+    {
+        begin_index++;
+        i++;
+    }
+    i = original.size() - 1;
+    while(isblank(original[i]) != 0 && i != 0)
+        i--;
+     if(begin_index == original.size())
+        return "";
+    return original.substr(begin_index, i + 1);
 }
 
 int ft_isalpha(std::string str , int cnt)
@@ -16,8 +36,10 @@ int ft_isalpha(std::string str , int cnt)
             i++;
        else  if(std::isdigit(str[i]))
             i++;
+        else if( i != 0 && str[i] == '.')
+            i++;
         else{
-            std::cout << "exit" << "|" << str[i] << cnt << "|" << std::endl;
+            // std::cout << "exit" << "|" << str[i] << cnt << "|" << std::endl;
             return -1;
         }
     }
@@ -87,64 +109,73 @@ void Btc(std::string file_Input, std::string Data)
     m_date items;
     std::fstream file_1;
     std::fstream  file_2;
-    items.count = 0;
     try{
       file_1.open(file_Input.data(), std::ios::in);
       file_2.open(Data.data(), std::ios::in);
         if(!file_1.is_open() || !file_2.is_open())
-        {
-            std::cout << "Loading.... " << std::endl;
             throw -1;
-        }
         while(std::getline(file_1, items.line, '\n'))
         {
                 std::string key = items.line.substr(0,  items.line.find(","));
                 std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
-                if(key != "date")
-                    items.price.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
+                items.price.insert(std::pair<std::string, double>(key, static_cast<double>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
         }
 
-        int 
+        // int 
         while(std::getline(file_2, items.line, '\n'))
         {
+            // items.line = trim(items.line);
+                // std::cout <<"|" <<  items.line  << "|" << items.line.size()<< std::endl;
             int pos = items.line.find("|");
-            if(pos == -1)
-                std::cout << "Error: bad input => " << items.line  << std::endl;
+            if(pos == -1 && items.line.size() != 0)
+            {
+                std::cout << "Error: bad input =>" << std::endl;
+
+            }
             else
             {
                 std::string key = items.line.substr(0,  pos);
                 std::string value = items.line.substr(pos + 1, strlen(items.line.data()));
+                key = trim(key);
+                value = trim(value);
+                
                 double number  = static_cast<double>(atof(value.data()));
-                if(number > 1000)
+                if(ft_isalpha(value, 2) == -1 && trim(value) != "value")
+                    {
+                        std::cout << "Error: bad input : " <<"|" <<  trim(value) << "|" << std::endl;
+                    }
+                else if(number > 1000)
                     std::cout << "Error: too large a number"  << std::endl;
                 else if(number < 0)
                     std::cout << "Error: not a positive number"  << std::endl;
                 else
                 {
-                   if(parser_date(key) != 0)
-                   {
+                    // std::cout << "key:   " << key  << "  "<<  "value :   " << value << std::endl;
+                   
+                   if(parser_date(key) != 0 )
+                    {
+                       
+                        // std::cout  << key << std::endl;
                         items.it = items.price.find(key);
                         if(items.it == items.price.end())
                         {
                             items.it = items.price.lower_bound(key);
                             items.it--;
-                            // items.it--;
-                            std::cout << key << " => " << number << " = " << (items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << number << " = " << (float)(items.it->second * number) << std::endl; 
                         }
-                    else
-                    {
-                        std::cout << key << " => " << number << " = " << (items.it->second * number) << std::endl; 
-                    }
+                        else
+                        {
+                            std::cout << key << " => " << number << " = " << (float)(items.it->second * number) << std::endl; 
+                        }
                    }
-                    else  if(key != "date ")
+                    else  if(trim(key) != "date" && items.line.size())
                     {
-                        std::cout << "Error: bad input =>" << items.line << std::endl;
+                        // std::cout << "|" << key << "|" <<std::endl;
+                        std::cout << "Error: bad input"<< std::endl;
                     }   
                 }
             } 
-            items.count++;
         }
-        std::cout << "Number of items :" <<  items.count <<  std::endl;
     }
     catch(...)
     {
