@@ -20,9 +20,15 @@ void push_stack(std::string str)
     while(os >> word)
     {
         if(word.length() != 1 || (isdigit(word[0]) == 0 && is_operator(word, count_op) != 1))
+        {
             printerror();
+        }
         else if((isdigit(word[0]) != 1 && st.size() == 0))
+        {
+
+            std::cout << "Invalid : << " << std::endl;
             printerror();
+        }
         else if(isdigit(word[0]))
         {
             st.push(atol(word.c_str()));
@@ -33,7 +39,6 @@ void push_stack(std::string str)
     }
     if(count_digit - count_op != 1 || st.size() != 1)
     {
-        std::cout << st.size() << std::endl;
         printerror();
     }
     std::cout << st.top() << std::endl;

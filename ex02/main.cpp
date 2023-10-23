@@ -2,10 +2,11 @@
 
 int main(int ac, char **av)
 {
+    if(ac == 1)
+        return 0;
     mergeItems Items;
-    double time_before_loop_end = 0;
-    double time_before_loop_begins = 0;
-    timeval currentTime;
+    timeval endTime;
+    timeval startTime;
 
 
     fullCnt(Items.cnt1, ac, av , 1);
@@ -13,23 +14,18 @@ int main(int ac, char **av)
 
     printfContainer(Items.cnt2, "Before: ");
 
-    gettimeofday(&currentTime, 0);
-    time_before_loop_begins = currentTime.tv_sec * 1000000 + currentTime.tv_usec;
+    gettimeofday(&startTime, NULL);
     mergeSort(Items.cnt2, 0, Items.cnt2.size());
-    gettimeofday(&currentTime, 0);
-    time_before_loop_end = currentTime.tv_sec * 1000000 + currentTime.tv_usec;
-    Items.time_sort_deque = time_before_loop_end - time_before_loop_begins;
+    gettimeofday(&endTime, NULL);
+    Items.time_sort_list = (endTime.tv_sec - startTime.tv_sec) * 1000000.0 + (endTime.tv_usec - startTime.tv_usec);
 
-    gettimeofday(&currentTime, 0);
-    time_before_loop_begins = currentTime.tv_sec * 1000000 + currentTime.tv_usec;
+    gettimeofday(&startTime, 0);
     mergeSort(Items.cnt1, 0, Items.cnt1.size());
-    gettimeofday(&currentTime, 0);
-    time_before_loop_end = currentTime.tv_sec * 1000000 + currentTime.tv_usec;
-    Items.time_sort_vector = time_before_loop_end - time_before_loop_begins;
+    gettimeofday(&endTime, 0);
+    Items.time_sort_vector = (endTime.tv_sec - startTime.tv_sec) * 1000000.0 + (endTime.tv_usec - startTime.tv_usec);
 
 
     printfContainer(Items.cnt2, "After: ");
-    // printfContainer(Items.cnt1, "After: ");
-    std::cout << "Time to process a range of " << Items.cnt1.size() << " elements with std::vector "  << Items.time_sort_vector << " us" <<  std::endl;
-    std::cout << "Time to process a range of " << Items.cnt2.size() << " elements with std::deque " << Items.time_sort_deque <<  " us"  << std::endl;
+    std::cout << "Time to process a range of " << Items.cnt1.size() << " elements with std::vector " << std::fixed  << Items.time_sort_vector << " us" <<  std::endl;
+    std::cout << "Time to process a range of " << Items.cnt2.size() << " elements with std::list "  << Items.time_sort_list <<  " us"  << std::endl;
 }

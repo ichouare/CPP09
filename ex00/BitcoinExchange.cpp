@@ -28,7 +28,7 @@ int ft_isalpha(std::string str , int cnt)
    unsigned int i = 0;
     while(i < str.size())
     {
-        if(cnt == 2 && (std::isdigit(str[i]) || str[i] == 32 || str[i] == '\n'))
+        if(cnt == 2 && (std::isdigit(str[i]) || str[i] == 32 || str[i] == '\n' || str[i] == '-'))
             i++;
        else  if(std::isdigit(str[i]))
             i++;
@@ -74,8 +74,7 @@ int check_date_data(m_date m_d)
 int parser_date_data(std::string key)
 {
     m_date Date;
-    std::deque<std::string> date;
-    std::deque<std::string>::iterator it;
+    std::string date[5];
     int i = 0;
     int pos = 0;
     while(key.size())
@@ -83,26 +82,24 @@ int parser_date_data(std::string key)
         pos = key.find("-");
         if(pos != -1)
         {
-            date.push_back(key.substr(0, key.find("-")).data());
+            date[i] = key.substr(0, key.find("-")).data();
             key = key.substr(key.find("-") + 1 , key.size());
         }
         else
         {
-            date.push_back(key.data());
+            date[i] = key.data() ;
             key = "";
         }
         i++;
     }
     if(i != 3)
         return 0;
-    it = date.begin();
     i = 0;
-    while(it != date.end())
+    while(i < 3)
     {
-        if(ft_isalpha(*it, i) == -1)
+        if(ft_isalpha(date[i], i) == -1)
             return 0;
-        Date.date[i] = static_cast<float>(atof((*it).data()));
-    it++;
+        Date.date[i] = static_cast<float>(atof((date[i]).data()));
     i++;
     }
     if(check_date_data(Date) == 0)
@@ -112,9 +109,7 @@ int parser_date_data(std::string key)
 
 int parser_date(std::string key, m_date& Date)
 {
-    // m_date Date;
-    std::deque<std::string> date;
-    std::deque<std::string>::iterator it;
+    std::string date[5];
     int i = 0;
     int pos = 0;
     while(key.size())
@@ -122,26 +117,24 @@ int parser_date(std::string key, m_date& Date)
         pos = key.find("-");
         if(pos != -1)
         {
-            date.push_back(key.substr(0, key.find("-")).data());
+            date[i] = key.substr(0, key.find("-")).data();
             key = key.substr(key.find("-") + 1 , key.size());
         }
         else
         {
-            date.push_back(key.data());
+            date[i] = key.data();
             key = "";
         }
         i++;
     }
     if(i != 3)
         return 0;
-    it = date.begin();
     i = 0;
-    while(it != date.end())
+    while(i < 3)
     {
-        if(ft_isalpha(*it, i) == -1)
+        if(ft_isalpha(date[i], i) == -1)
             return 0;
-        Date.date[i] = static_cast<float>(atof((*it).data()));
-    it++;
+        Date.date[i] = static_cast<float>(atof((date[i]).data()));
     i++;
     }
     if(check_date(Date) == 0)
@@ -199,7 +192,7 @@ void Btc(std::string file_Input, std::string Data)
             int pos = items.line.find("|");
             if(pos == -1 && items.line.size() != 0)
             {
-                std::cout << "Error: bad input =>" << std::endl;
+                std::cout << "Error: bad input => " << items.line << std::endl;
 
             }
             else
@@ -227,11 +220,11 @@ void Btc(std::string file_Input, std::string Data)
                         {
                             items.it = items.price.lower_bound(key);
                             items.it--;
-                            std::cout << key << " => " << number  << "*" << items.it->second << " = "  << std::setprecision(10) << (items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << value  << " = "  << std::setprecision(8) << (items.it->second * number) << std::endl; 
                         }
                         else
                         {
-                            std::cout << key << " => " << number << " = " <<  std::setprecision(10) << (items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << value << " = " <<  std::setprecision(8) << (items.it->second * number) << std::endl; 
                         }
                    }
                     else  if(trim(key) != "date" && items.line.size())
