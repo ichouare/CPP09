@@ -26,6 +26,7 @@ std::string trim(std::string original)
 int ft_isalpha(std::string str , int cnt)
 {
    unsigned int i = 0;
+   int count = 0;
     while(i < str.size())
     {
         if(cnt == 2 && (std::isdigit(str[i]) || str[i] == 32 || str[i] == '\n' || str[i] == '-'))
@@ -33,11 +34,16 @@ int ft_isalpha(std::string str , int cnt)
        else  if(std::isdigit(str[i]))
             i++;
         else if( i != 0 && str[i] == '.')
+        {
             i++;
+            count++;
+        }
         else{
             return -1;
         }
     }
+    if(count > 1)
+        return -1;
     return 0;
 }
 
@@ -63,7 +69,8 @@ int check_date_data(m_date m_d)
     int i = 0;
     while(i < 3)
     {
-        if(m_d.date[1] < 0 || m_d.date[1] > 12 || m_d.date[2] < 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
+
+        if(m_d.date[i] == 0 || m_d.date[1] < 0 || m_d.date[1] > 12 || m_d.date[2] < 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
             return (0);
         
         i++;
@@ -166,13 +173,17 @@ void   available_date(m_date& items)
 
 void read_data_file(std::fstream& file_1,m_date& items)
 {
+    int pos = -1;
     while(std::getline(file_1, items.line, '\n'))
     {
-                std::string key = items.line.substr(0,  items.line.find(","));
-                std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
+                pos = items.line.find(",");
+                if(pos == -1)
+                    throw -1;
+                std::string key = items.line.substr(0,  pos);
+                std::string value = items.line.substr(pos + 1, strlen(items.line.data()));
                 key = trim(key);
                 value = trim(value);
-                if((key.empty() || value.empty()) || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
+                if(key.empty() || value.empty() || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
                     throw -1;
                 items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
     }
