@@ -11,6 +11,7 @@
 #include <iomanip>
  #include<ctime>
  #include <sys/time.h>
+ #include <algorithm> 
 
 
 struct mergeItems
@@ -23,8 +24,8 @@ struct mergeItems
 
 void insetSort(std::vector<int>& arr, int begin, int end);
 void insetSort(std::deque<int>& arr, int begin, int end);
-void mergeSort(std::vector<int>& arr, int begin, int end);
-void mergeSort(std::deque<int>& arr, int begin, int end);
+// void mergeSort(std::vector<int>& arr, int begin, int end);
+// void mergeSort(std::deque<int>& arr, int begin, int end);
 void printfContainer(std::vector<int> arr, std::string msg);
 void printfContainer(std::deque<int> arr, std::string msg);
 int is_disgit(std::string str);
@@ -44,10 +45,28 @@ void fullCnt(T& cnt,int ac, char** nbrs, int i)
         j++;
     }
 }
+int find_max(std::deque<int> vc, int start,  int end);
+int find_max(std::vector<int> vc, int start,  int end);
+void swap_pair(std::vector<int>& vc, int index,  int end);
+void sort_pair(std::vector<int>& vc, int start, int end);
+void sort_pair(std::deque<int>& vc, int start, int end);
+void  build_jacob_insertion_sequence(std::vector<int>& pend, std::vector<int>& jacob_insertion_sequence);
+void  build_jacob_insertion_sequence(std::deque<int>& pend, std::deque<int>& jacob_insertion_sequence);
+int binary_search(const std::vector<int>& S, int key, int low, int high);
+int binary_search(const std::deque<int>& S, int key, int low, int high);
+void inseting_to_S(std::vector<int>&S, std::vector<int> &vc);
+void inseting_to_S(std::deque<int>&S, std::deque<int> &vc);
+void sort_vector(std::vector<int>& vc);
+void sort_vector(std::deque<int>& vc);
+int jacobsthal(int n);
 
 
 
-// void insetSort(std::vector<int>& arr, int begin , int end)
+
+
+
+
+// void insetSort(std::deque<int>& arr, int begin , int end)
 // {
 //     int i = begin + 1;
 //     int j = 0;
