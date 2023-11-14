@@ -6,6 +6,7 @@
 #include <map>
 #include <string.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -30,5 +31,4 @@ int parser_date(std::string key, m_date& Date);
 void check_files(std::string file_Input, std::string Data, std::fstream& file_1, std::fstream& file_2);
 void   available_date(m_date& items);
 void read_data_file(std::fstream& file_1,m_date& items);
-
 #endif
