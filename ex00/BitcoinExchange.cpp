@@ -26,18 +26,26 @@ std::string trim(std::string original)
 int ft_isalpha(std::string str , int cnt)
 {
    unsigned int i = 0;
+   int count = 0;
     while(i < str.size())
     {
-        if(cnt == 2 && (std::isdigit(str[i]) || str[i] == 32 || str[i] == '\n'))
+        if(cnt == 2 && (std::isdigit(str[i])  || str[i] == '\n' || str[i] == '-'))
             i++;
        else  if(std::isdigit(str[i]))
             i++;
-        else if( i != 0 && str[i] == '.')
+        else if(i == 0 && cnt == 2 && str[i] == '+')
             i++;
+        else if( i != 0 && i != str.size() - 1 && str[i] == '.')
+        {
+            i++;
+            count++;
+        }
         else{
             return -1;
         }
     }
+    if(count > 1)
+        return -1;
     return 0;
 }
 
@@ -48,7 +56,7 @@ int check_date(m_date& m_d)
     while(i < 3)
     {
         if(m_d.date[0] <  m_d.min_date[0]
-            || (m_d.date[0] ==  m_d.min_date[0] && m_d.date[1] <  m_d.min_date[1] && m_d.date[2] <  m_d.min_date[2]) 
+            || (m_d.date[0] ==  m_d.min_date[0] && m_d.date[1] <=  m_d.min_date[1] && m_d.date[2] <  m_d.min_date[2]) 
             || m_d.date[1] <= 0 || m_d.date[1] > 12 || m_d.date[2] <= 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
             return (0);
         
@@ -63,20 +71,35 @@ int check_date_data(m_date m_d)
     int i = 0;
     while(i < 3)
     {
-        if(m_d.date[1] <= 0 || m_d.date[1] > 12 || m_d.date[2] <= 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
+
+        if(m_d.date[i] == 0 || m_d.date[1] <= 0 || m_d.date[1] > 12 || m_d.date[2] <= 0 || m_d.date[2] > max_days_in_month[m_d.date[1] - 1] )
             return (0);
         
         i++;
     }
     return 1;
 }
+int del_number(std::string key, char po)
+{
+    int count_comma = 0;
+    int i = 0;
+    while(key[i])
+    {
+        if(key[i] == po) 
+            count_comma++;
+        i++;
+    }
+    if(count_comma != 2)
+        return -1;
+    return 0;
+}
 
 int parser_date_data(std::string key)
 {
     m_date Date;
     std::string date[5];
-    // std::deque<std::string> date;
-    // std::deque<std::string>::iterator it;
+    if(del_number(key, '-') == -1)
+        return 0;
     int i = 0;
     int pos = 0;
     while(key.size())
@@ -89,21 +112,22 @@ int parser_date_data(std::string key)
         }
         else
         {
-            date[i]=key.data();
+            date[i] = key.data();
+            // std::cout << key << std::endl;
             key = "";
         }
         i++;
     }
+    // std::cout << key << std::endl;
     if(i != 3)
         return 0;
-    // it = date.begin();
     i = 0;
     while(i < 3)
     {
+        // std::cout <<  date[i] << std::endl;
         if(ft_isalpha(date[i], i) == -1)
             return 0;
         Date.date[i] = static_cast<float>(atof((date[i]).data()));
-    // it++;
     i++;
     }
     if(check_date_data(Date) == 0)
@@ -113,30 +137,28 @@ int parser_date_data(std::string key)
 
 int parser_date(std::string key, m_date& Date)
 {
-    // m_date Date;
-    // std::deque<std::string> date;
-    // std::deque<std::string>::iterator it;
-     std::string date[5];
+    std::string date[5];
     int i = 0;
     int pos = 0;
+    if(del_number(key, '-') == -1)
+        return 0;
     while(key.size())
     {
         pos = key.find("-");
         if(pos != -1)
         {
-             date[i] = key.substr(0, key.find("-")).data();
+            date[i] = key.substr(0, key.find("-")).data();
             key = key.substr(key.find("-") + 1 , key.size());
         }
         else
         {
-            date[i]=key.data();
+            date[i] = key.data();
             key = "";
         }
         i++;
     }
     if(i != 3)
         return 0;
-    // it = date.begin();
     i = 0;
     while(i < 3)
     {
@@ -174,16 +196,19 @@ void   available_date(m_date& items)
 
 void read_data_file(std::fstream& file_1,m_date& items)
 {
+    int pos = -1;
     while(std::getline(file_1, items.line, '\n'))
     {
-                std::string key = items.line.substr(0,  items.line.find(","));
-                std::string value = items.line.substr(items.line.find(",") + 1, strlen(items.line.data()));
+                pos = items.line.find(",");
+                if(pos == -1)
+                    throw -1;
+                std::string key = items.line.substr(0,  pos);
+                std::string value = items.line.substr(pos + 1, strlen(items.line.data()));
                 key = trim(key);
                 value = trim(value);
-                if((key.empty() || value.empty()) || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
+                if(key.empty() || value.empty() || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
                     throw -1;
-                if(key != "date" && value !="exchange_rate")
-                    items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
+                items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
     }
     available_date(items);
     }
@@ -196,12 +221,14 @@ void Btc(std::string file_Input, std::string Data)
     try{
         check_files(file_Input, Data, file_1, file_2);
         read_data_file(file_1, items);
+        if(items.price.empty())
+            throw -1;
         while(std::getline(file_2, items.line, '\n'))
         {
             int pos = items.line.find("|");
-            if(pos == -1 && items.line.size() != 0)
+            if((pos == -1 && items.line.size() != 0))
             {
-                std::cout << "Error: bad input =>" << std::endl;
+                std::cout << "Error: bad input => " << items.line << std::endl;
 
             }
             else
@@ -210,9 +237,8 @@ void Btc(std::string file_Input, std::string Data)
                 std::string value = items.line.substr(pos + 1, strlen(items.line.data()));
                 key = trim(key);
                 value = trim(value);
-                
                 double number  = static_cast<float>(atof(value.data()));
-                if((items.line.empty() == 0 &&  (value.empty() || key.empty())) || (ft_isalpha(value, 2) == -1 && trim(value) != "value"))
+                if((items.line.empty() == 0 &&  (value.empty() || key.empty())) ||  (ft_isalpha(value, 2) == -1 && trim(value) != "value"))
                     {
                         std::cout << "Error: bad input" << std::endl;
                     }
@@ -224,19 +250,16 @@ void Btc(std::string file_Input, std::string Data)
                 {
                    if(parser_date(key, items) != 0 )
                     {
-                        if(items.price.empty())
-                            throw -1;
                         items.it = items.price.find(key);
                         if(items.it == items.price.end())
                         {
                             items.it = items.price.lower_bound(key);
-                            if(items.it != items.price.begin())
-                                items.it--;
-                            std::cout << key << " => " << number  << " = "  << std::setprecision(8) << (items.it->second * number) << std::endl; 
+                            items.it--;
+                            std::cout << key << " => " << value  << " = "  << std::setprecision(8) << (items.it->second * number) << std::endl; 
                         }
                         else
                         {
-                            std::cout << key << " => " << number << " = " <<  std::setprecision(8) << (items.it->second * number) << std::endl; 
+                            std::cout << key << " => " << value << " = " <<  std::setprecision(8) << (items.it->second * number) << std::endl; 
                         }
                    }
                     else  if(trim(key) != "date" && items.line.size())
