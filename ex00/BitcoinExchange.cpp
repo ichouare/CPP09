@@ -1,19 +1,19 @@
 #include "./BitcoinExchange.hpp"
 
 
-std::string trim(std::string original)
+std::string trim(std::string& original)
 {
     unsigned int begin_index = 0;
     unsigned int i = 0;
     if(original.size() == 0)
         return "";
-    while(isblank(original[i]) != 0 && i <= original.size())
+    while(isblank(original[i])&& i <= original.size())
     {
         begin_index++;
         i++;
     }
     i = original.size() - 1;
-    while(isblank(original[i]) != 0 && i != 0)
+    while(isblank(original[i]) && i != 0)
         i--;
      if(begin_index == original.size())
         return "";
@@ -113,18 +113,15 @@ int parser_date_data(std::string key)
         else
         {
             date[i] = key.data();
-            // std::cout << key << std::endl;
             key = "";
         }
         i++;
     }
-    // std::cout << key << std::endl;
     if(i != 3)
         return 0;
     i = 0;
     while(i < 3)
     {
-        // std::cout <<  date[i] << std::endl;
         if(ft_isalpha(date[i], i) == -1)
             return 0;
         Date.date[i] = static_cast<float>(atof((date[i]).data()));
@@ -155,6 +152,8 @@ int parser_date(std::string key, m_date& Date)
             date[i] = key.data();
             key = "";
         }
+        if((i == 0 && date[i].length() != 4)  || (i != 0 && date[i].length() != 2) )
+            return 0;
         i++;
     }
     if(i != 3)
@@ -208,9 +207,10 @@ void read_data_file(std::fstream& file_1,m_date& items)
                 value = trim(value);
                 if(key.empty() || value.empty() || (key != "date" && parser_date_data(key) == 0) || (value  != "exchange_rate" && ft_isalpha(value, 2) == -1) )
                     throw -1;
-                items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data())))); // check insert fucntion if is avalible in c++98 
+                items.price.insert(std::pair<std::string, float>(key, static_cast<float>(atof(value.data()))));
+                // std::cout << "items: " << items.price
+                available_date(items);
     }
-    available_date(items);
     }
 
 void Btc(std::string file_Input, std::string Data)
@@ -258,9 +258,7 @@ void Btc(std::string file_Input, std::string Data)
                             std::cout << key << " => " << value  << " = "  << std::setprecision(8) << (items.it->second * number) << std::endl; 
                         }
                         else
-                        {
                             std::cout << key << " => " << value << " = " <<  std::setprecision(8) << (items.it->second * number) << std::endl; 
-                        }
                    }
                     else  if(trim(key) != "date" && items.line.size())
                         std::cout << "Error: bad input"<< std::endl;

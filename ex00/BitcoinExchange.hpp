@@ -22,7 +22,7 @@
 };
 
 void Btc(std::string file_Input, std::string Data);
-std::string trim(std::string original);
+std::string trim(std::string& original);
 int ft_isalpha(std::string str , int cnt);
 int check_date(m_date& m_d);
 int check_date_data(m_date m_d);
