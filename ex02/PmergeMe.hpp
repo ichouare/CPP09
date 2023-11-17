@@ -23,9 +23,6 @@ struct mergeItems
 
 int jacobsthal(int n);
 int is_disgit(std::string str);
-void sort_deque_pairs(std::deque<int> & vc , std::deque<int> & S, std::deque<int> & pend);
-void sort_vector_pairs(std::vector<int> & vc , std::vector<int> & S, std::vector<int> & pend);
-
 template <typename T>
 void fullCnt(T& cnt,int ac, char** nbrs, int i)
 {
@@ -80,7 +77,7 @@ void inseting_to_S(T &vc, T &S, T &pend)
     typename T::iterator it;
     unsigned int i = 0;
     int  j = 0;
-    int index = 0;
+    unsigned int  index = 0;
     i = 0;
     unsigned int  k = 3;
     while( final_index.size() != pend.size())
@@ -99,27 +96,18 @@ void inseting_to_S(T &vc, T &S, T &pend)
     k++;
     }
     i = 0;
-    unsigned int size = pend.size();
-    while(i < size)
+    // int x = 0;
+    std::sort(final_index.begin(), final_index.end());
+    while(pend.size())
     {
-        it = std::find(pend.begin(),pend.end(), pend[final_index[i] - 1]);
-        if(it != pend.end())
-        {
-            S.insert((S.begin() + binary_search(S, *it, 0 , S.size())), *it);
-            index = std::distance(pend.begin(), it);
-            pend.erase(pend.begin() + index);
-        }
+        if(final_index[i] >= (int)pend.size())
+            index = pend.size();
+        else
+            index = final_index[i];
+        S.insert((S.begin() + binary_search(S, pend[index - 1],0 ,  S.size())), pend[index - 1]);
+        pend.erase(pend.begin() + (index - 1));
         i++;
     }
-    if(pend.size())
-    {
-        i  = 0;
-        while(i <pend.size())
-        {
-            S.insert((S.begin() + binary_search(S, pend[i], 0 , S.size())), pend[i]);
-            i++;
-        }
-    }    
     vc = S;
 }
 
@@ -190,6 +178,7 @@ void sort_cnt_pairs(T & vc , T & S, T & pend)
         pend.push_back(tmp[i].second);
         i++;
     }
+
 }
 template <typename T> 
 void sort_cnt(T& vc)
@@ -204,39 +193,10 @@ void sort_cnt(T& vc)
     }
     sort_cnt_pairs(vc, S, pend);
     inseting_to_S(vc, S, pend);
+    
     if(straggler != -1)
         vc.insert((vc.begin() + binary_search(vc, straggler, 0 , vc.size())), straggler); 
 }
-
-
-// template <typename T> 
-// void sort_cnt_pairs(T & vc , T & S, T & pend)
-// {
-//     std::vector<std::pair<int, int> > tmp;
-//     unsigned int  i = 0;
-//     while(i < vc.size())
-//     {
-//         tmp.push_back(std::pair<int, int>(vc[i],  vc[i + 1]));
-//         i+=2;
-//     }
-//     i = 0;
-//     while(i < tmp.size())
-//     {
-//         if(tmp[i].first < tmp[i].second)
-//             std::swap(tmp[i].first, tmp[i].second);
-//         i++;
-//     }
-//     sort_pairs(tmp, 0, tmp.size());
-//     i = 0;
-//     while(i < tmp.size())
-//     {
-//         S.push_back(tmp[i].first);
-//         pend.push_back(tmp[i].second);
-//         i++;
-//     }
-// }
-
-
 
 
 

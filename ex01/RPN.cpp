@@ -33,7 +33,6 @@ void push_stack(std::string str)
     }
     if(count_digit - count_op != 1 || st.size() != 1)
     {
-        std::cout << st.size() << std::endl;
         printerror();
     }
     std::cout << st.top() << std::endl;

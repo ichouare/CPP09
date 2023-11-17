@@ -17,7 +17,7 @@ std::string trim(std::string& original)
         i--;
      if(begin_index == original.size())
         return "";
-    return original.substr(begin_index, i + 1);
+    return original.substr(begin_index, (i - begin_index) + 1);
 }
 
 

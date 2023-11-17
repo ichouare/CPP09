@@ -8,6 +8,8 @@ int is_disgit(std::string str)
     unsigned  i = 0;
     while(i < str.size())
     {
+        if(i == 0 && str[i] == '+')
+            i++;
         if(isdigit(str[i]) == 0)
             return 1;
         i++;
